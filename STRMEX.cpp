@@ -1,0 +1,110 @@
+#include<bits/stdc++.h>
+#include<bits/extc++.h>
+using namespace std;
+#pragma GCC target ("avx2")
+#pragma GCC optimize ("O3")
+#pragma GCC optimize ("unroll-loops")
+#define mdl 1000000007
+#define li long int
+#define lli long long int
+#define ld long double
+#define endl '\n'
+constexpr int MAXN=(int)1e6;
+li dp[MAXN+2],dp1[MAXN+2];
+li next0[MAXN],next1[MAXN];
+void solve(){
+
+    string s;
+    cin>>s;
+    li n=s.size();
+    li last_pos=-1;
+    for(li i=0;i<n;i++){
+
+        if(s[i]=='0'){
+
+            for(li j=last_pos+1;j<=i;j++){
+
+                next0[j]=i;
+            }
+            last_pos=i;
+        }
+    }
+    for(li i=last_pos+1;i<n;i++){
+
+        next0[i]=n;
+    }
+    if(next0[0]==n){
+
+        cout<<"0"<<endl;
+        return;
+    }
+
+    last_pos=-1;
+    for(li i=0;i<n;i++){
+
+        if(s[i]=='1'){
+            for(li j=last_pos+1;j<=i;j++){
+
+                next1[j]=i;
+            }
+            last_pos=i;
+        }
+    }
+
+    for(li i=last_pos+1;i<n;i++)next1[i]=n;
+    dp[n]=dp[n+1]=0;
+    dp1[n]=dp1[n+1]=0;
+    for(li i=n-1;i>=0;i--){
+
+        dp[i]=dp[i+1];
+        if(s[i]=='0'&&next1[i]<n){
+            dp[i]=max(dp[i],dp[next1[i]+1]+1);
+        }
+        if(s[i]=='1'&&next0[i]<n){
+            dp[i]=max(dp[i],dp[next0[i]+1]+1);
+        }
+        dp1[i]=dp1[i+1];
+        if(next1[i]<n){
+            dp[i]=max(dp1[i],dp[next1[i]+1]+1);
+        }
+    }
+    li len=dp1[0]+1;
+    li curind=next1[0]+1;
+    string ans="1";
+    for(li i=1;i<len;i++){
+
+        if(curind>=n){
+
+            ans.push_back('0');
+            continue;
+        }
+        if(next0[curind]>=n){
+
+            ans.push_back('0');
+            curind=next0[curind]+1;
+            continue;
+        }
+        if(dp[next0[curind]+1]<len-i-1){
+
+            ans.push_back('0');
+            curind=next0[curind]+1;
+        }
+        else{
+
+            ans.push_back('1');
+            curind=next1[curind]+1;
+        }
+    }
+    cout<<ans<<endl;
+}
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    li t;
+    cin>>t;
+    while(t--){
+        solve();
+    }
+    return 0;
+}
